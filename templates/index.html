@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fish Weight Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Predict the weight of your fish:</h1>
+    <form id="dataForm">
+        <label>
+            Species:
+            <select id="Species" name="Species" required>
+                <option value="Perch">Perch</option>
+                <option value="Bream">Bream</option>
+                <option value="Roach">Roach</option>
+                <option value="Pike">Pike</option>
+                <option value="Smelt">Smelt</option>
+                <option value="Parkki">Parkki</option>
+                <option value="Whitefish">Whitefish</option>
+            </select>
+        </label><br><br>
+
+        <label>Length 1: <input type="text" id="Length1" name="Length1" placeholder="Length 1" required></label><br><br>
+        <label>Length 2: <input type="text" id="Length2" name="Length2" placeholder="Length 2" required></label><br><br>
+        <label>Length 3: <input type="text" id="Length3" name="Length3" placeholder="Length 3" required></label><br><br>
+        <label>Height: <input type="text" id="Height" name="Height" placeholder="Height" required></label><br><br>
+        <label>Width: <input type="text" id="Width" name="Width" placeholder="Width" required></label><br><br>
+
+        <button type="submit">Predict Weight</button>
+        <div id="response"></div>
+    </form>
+
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction) {
+                    document.getElementById('response').innerText = 'Weight predicted: ' + data.prediction;
+                } else {
+                    document.getElementById('response').innerText = 'Error: ' + data.error;
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('response').innerText = 'Error: Failed to connect to server.';
+            });
+        });
+    </script>
+</body>
+</html>
